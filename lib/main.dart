@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Landing Page'),
     );
   }
 }
@@ -120,6 +120,78 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class NewPostPage extends StatelessWidget {
+  const NewPostPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget buildTitle(String title){
+      return Container(
+        height: 50,
+        padding: const EdgeInsets.all(8),
+        child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(title)
+        ),
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('New Connection'),
+        shadowColor: Colors.black,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(8),
+        children: <Widget>[
+          buildTitle('Title'),
+          const DropdownButtonExample(list: ["sjdfkh", "fsse"]),
+        ],
+      )
+    );
+  }
+}
+
+class DropdownButtonExample extends StatefulWidget {
+  final List<String> list;
+  const DropdownButtonExample({super.key, required this.list});
+  @override
+  State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
+}
+
+class _DropdownButtonExampleState extends State<DropdownButtonExample> {
+  String dropdownValue = "";
+  @override
+  void initState() {
+    super.initState();
+    dropdownValue = widget.list.first;
+  }
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: dropdownValue,
+      icon: const Icon(Icons.arrow_downward),
+      elevation: 16,
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String? value) {
+        // This is called when the user selects an item.
+        setState(() {
+          dropdownValue = value!;
+        });
+      },
+      items: widget.list.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
   }
 }
