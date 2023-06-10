@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+        options: const FirebaseOptions(
+            apiKey: "AIzaSyCG2OW2LYSTKPUBqf-3jIy_BQAmY2RXA5Y",
+            appId: "AIzaSyCG2OW2LYSTKPUBqf-3jIy_BQAmY2RXA5Y",
+            messagingSenderId: "1050223470454",
+            projectId: "gdsc-flutterfest"));
+  } else {
+    Firebase.initializeApp();
+  }
   runApp(const MyApp());
 }
 
@@ -31,7 +44,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Landing Page'),
+      home: const NewPostPage(),
     );
   }
 }
