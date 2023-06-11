@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -137,6 +139,15 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+Future<List<String>> getData(collectionRef) async {
+  // Get docs from collection reference
+  QuerySnapshot querySnapshot = await collectionRef.get();
+
+  // Get data from docs and convert map to List
+  final allData = querySnapshot.docs.map((doc) => doc.id).toList();
+  return allData;
+}
+
 class NewPostPage extends StatelessWidget {
   const NewPostPage({super.key});
 
@@ -161,7 +172,7 @@ class NewPostPage extends StatelessWidget {
         padding: const EdgeInsets.all(8),
         children: <Widget>[
           buildTitle('Title'),
-          const DropdownButtonExample(list: ["sjdfkh", "fsse"]),
+          const DropdownButtonExample(collection: "categories"),
         ],
       )
     );
@@ -169,42 +180,59 @@ class NewPostPage extends StatelessWidget {
 }
 
 class DropdownButtonExample extends StatefulWidget {
-  final List<String> list;
-  const DropdownButtonExample({super.key, required this.list});
+  final String collection;
+  const DropdownButtonExample({super.key, required this.collection});
   @override
   State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
 }
 
 class _DropdownButtonExampleState extends State<DropdownButtonExample> {
   String dropdownValue = "";
+  List<String> list = [];
   @override
   void initState() {
     super.initState();
-    dropdownValue = widget.list.first;
+    final CollectionReference collectionRef = FirebaseFirestore.instance.collection(widget.collection);
+    list = getData(collectionRef) as List<String>;
+    dropdownValue = list.first;
   }
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: dropdownValue,
-      icon: const Icon(Icons.arrow_downward),
-      elevation: 16,
-      style: const TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
-      ),
-      onChanged: (String? value) {
-        // This is called when the user selects an item.
-        setState(() {
-          dropdownValue = value!;
-        });
-      },
-      items: widget.list.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+    return FutureBuilder<List<String>>(
+        future: getData(
+            FirebaseFirestore.instance.collection(widget.collection)),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
+          else if (snapshot.hasData) {
+            return DropdownButton<String>(
+              value: dropdownValue,
+              icon: const Icon(Icons.arrow_downward),
+              elevation: 16,
+              style: const TextStyle(color: Colors.deepPurple),
+              underline: Container(
+                height: 2,
+                color: Colors.deepPurpleAccent,
+              ),
+              onChanged: (String? value) {
+                // This is called when the user selects an item.
+                setState(() {
+                  dropdownValue = value!;
+                });
+              },
+              items: list.map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            );
+          }
+          else {
+            return const CircularProgressIndicator();
+          }
+        }
     );
   }
 }
