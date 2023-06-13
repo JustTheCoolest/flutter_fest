@@ -1,18 +1,22 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
+    final Map<String, String> keys = jsonDecode('assets/keys.json');
     await Firebase.initializeApp(
         options: const FirebaseOptions(
-            apiKey: "AIzaSyCG2OW2LYSTKPUBqf-3jIy_BQAmY2RXA5Y",
-            appId: "AIzaSyCG2OW2LYSTKPUBqf-3jIy_BQAmY2RXA5Y",
-            messagingSenderId: "1050223470454",
-            projectId: "gdsc-flutterfest"));
+            apiKey: keys['apiKey'],
+            appId: keys['appId'],
+            messagingSenderId: keys['messagingSenderId'],
+            projectId: keys['projectId']));
   } else {
     Firebase.initializeApp();
   }
